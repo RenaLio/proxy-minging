@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
   schedule:
-    - cron: '15 */2 * * *'
+    - cron: '15 */12 * * *'
   # - cron: '0 3,12 * * *'
   # 表达式生成  https://crontab.guru/
 

@@ -43,14 +43,28 @@ def get_config():
         new_list.append(url)
     return new_list
 
+# @logger.catch
+# def get_channel_http(channel_url):
+#     try:
+#         with requests.post(channel_url) as resp:
+#             data = resp.text
+#         url_list = re.findall("https?://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", data)  # 使用正则表达式查找订阅链接并创建列表
+#     except Exception as e:
+#         logger.error('channel_url',e)
+#         url_list = []
+#     finally:
+#         return url_list
+
 @logger.catch
 def get_channel_http(channel_url):
     try:
         with requests.post(channel_url) as resp:
             data = resp.text
         url_list = re.findall("https?://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", data)  # 使用正则表达式查找订阅链接并创建列表
+        logger.info(channel_url,'获取成功')
     except Exception as e:
         logger.error('channel_url',e)
+        logger.warning(channel_url, '获取失败')
         url_list = []
     finally:
         return url_list

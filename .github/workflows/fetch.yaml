@@ -1,0 +1,56 @@
+name: Fetch Subscriptions
+
+# 触发条件
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: '15 */2 * * *'
+  # - cron: '0 3,12 * * *'
+  # 表达式生成  https://crontab.guru/
+
+ 
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: 迁出代码
+      uses: actions/checkout@v2
+
+    - name: 安装Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+      
+    - name: 加载缓存
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/run_in_Actions/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+      
+    - name: 设置时区
+      run: sudo timedatectl set-timezone 'Asia/Shanghai'
+
+    - name: 安装依赖
+      run: |
+        pip install -r ./requirements.txt
+    - name: 执行任务
+      run: |
+        python ./main.py
+    - name: Commit
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add ./free
+        git add ./utils
+        git add sub_list
+        git commit -m "🍀 爬取订阅 $(date '+%Y-%m-%d %H:%M:%S')"
+        
+    - name: 推送更改
+      uses:  ad-m/github-push-action@master
+      with:
+         # github_token: ${{ secrets.TOKEN }}
+         branch: main

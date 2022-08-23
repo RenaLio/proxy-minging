@@ -58,7 +58,7 @@ def get_config():
 @logger.catch
 def get_channel_http(channel_url):
     try:
-        with requests.post(channel_url) as resp:
+        with requests.get(channel_url) as resp:
             data = resp.text
         url_list = re.findall("https?://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", data)  # 使用正则表达式查找订阅链接并创建列表
         logger.info(channel_url,'获取成功')

@@ -31,7 +31,7 @@ def yaml_check(path_yaml):
     logger.info('读取文件成功')
     return dict_url
 
-# @logger.catch
+@logger.catch
 def get_config():
     with open('./config.yaml',encoding="UTF-8") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
@@ -43,36 +43,38 @@ def get_config():
         new_list.append(url)
     return new_list
 
-# @logger.catch
-# def get_channel_http(channel_url):
-#     try:
-#         with requests.post(channel_url) as resp:
-#             data = resp.text
-#         url_list = re.findall("https?://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", data)  # 使用正则表达式查找订阅链接并创建列表
-#     except Exception as e:
-#         logger.error('channel_url',e)
-#         url_list = []
-#     finally:
-#         return url_list
-
 @logger.catch
 def get_channel_http(channel_url):
-    headers = {
-        'Referer': 'https://t.me/s/wbnet',
-        'sec-ch-ua-mobile': '?0',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
-    }
     try:
-        with requests.post(channel_url,headers=headers) as resp:
+        with requests.post(channel_url) as resp:
             data = resp.text
         url_list = re.findall("https?://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", data)  # 使用正则表达式查找订阅链接并创建列表
-        logger.info(channel_url+'获取成功')
+        logger.info(channel_url+'\t获取成功')
     except Exception as e:
-        logger.error('channel_url',e)
-        logger.warning(channel_url+'获取失败')
+        logger.warning(channel_url+'\t获取失败')
+        logger.error(channel_url+e)
         url_list = []
     finally:
         return url_list
+
+# @logger.catch
+# def get_channel_http(channel_url):
+#     headers = {
+#         'Referer': 'https://t.me/s/wbnet',
+#         'sec-ch-ua-mobile': '?0',
+#         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
+#     }
+#     try:
+#         with requests.post(channel_url,headers=headers) as resp:
+#             data = resp.text
+#         url_list = re.findall("https?://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", data)  # 使用正则表达式查找订阅链接并创建列表
+#         logger.info(channel_url+'获取成功')
+#     except Exception as e:
+#         logger.error('channel_url',e)
+#         logger.warning(channel_url+'获取失败')
+#         url_list = []
+#     finally:
+#         return url_list
 
 def filter_base64(text):
     ss = ['ss://','ssr://','vmess://','trojan://']
@@ -127,9 +129,10 @@ if __name__=='__main__':
     list_tg = get_config()
     logger.info('读取config成功')
     #循环获取频道订阅
+    url_list = []
     for channel_url in list_tg:
-        url_list = get_channel_http(channel_url)
-        url_list.extend(url_list)
+        temp_list = get_channel_http(channel_url)
+        url_list.extend(temp_list)
     logger.info('开始筛选---')
     thread_max_num = threading.Semaphore(32)  # 32线程
     bar = tqdm(total=len(url_list), desc='订阅筛选：')

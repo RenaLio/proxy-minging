@@ -16,7 +16,7 @@ def pre_check():
     if not folder:                   #判断是否存在文件夹如果不存在则创建为文件夹
         os.makedirs(path_year) 
 
-    floder = os.path.exists(path_mon)
+    folder = os.path.exists(path_mon)
     if not folder:                   #判断是否存在文件夹如果不存在则创建为文件夹
         os.makedirs(path_mon)
 
